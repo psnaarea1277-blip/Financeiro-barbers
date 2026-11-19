@@ -1,0 +1,2222 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEU FINANCEIRO | Gestão Financeira Offline para Barbeiros</title>
+
+  <!-- Tailwind CSS (com fallback CSS completo embutido para funcionamento 100% offline sem internet) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    if (window.tailwind) {
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              obsidian: '#09090B',
+              graphite: '#121215',
+              charcoal: '#1A1A1F',
+              slateborder: '#27272E',
+              gold: {
+                light: '#F3E5AB',
+                DEFAULT: '#D4AF37',
+                dark: '#B5952F',
+                muted: 'rgba(212, 175, 55, 0.14)'
+              }
+            }
+          }
+        }
+      };
+    }
+  </script>
+
+  <style>
+    /* Reset e Base 100% Offline (funciona mesmo se o dispositivo estiver completamente sem internet) */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-obsidian: #09090B;
+      --bg-graphite: #121215;
+      --bg-charcoal: #1A1A1F;
+      --border-subtle: #27272E;
+      --gold: #D4AF37;
+      --gold-light: #F3E5AB;
+      --gold-dark: #B5952F;
+      --text-white: #FFFFFF;
+      --text-gray: #A1A1AA;
+      --emerald: #34D399;
+      --amber: #FBBF24;
+      --red: #F87171;
+    }
+
+    body {
+      background-color: var(--bg-obsidian);
+      color: var(--text-white);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+    }
+
+    /* Utilitários essenciais de layout caso o CDN do Tailwind não carregue offline */
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .flex-1 { flex: 1 1 0%; }
+    .flex-wrap { flex-wrap: wrap; }
+    .items-center { align-items: center; }
+    .items-start { align-items: flex-start; }
+    .justify-between { justify-content: space-between; }
+    .justify-center { justify-content: center; }
+    .justify-around { justify-content: space-around; }
+    .grid { display: grid; }
+    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .gap-1\.5 { gap: 0.375rem; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-2\.5 { gap: 0.625rem; }
+    .gap-3 { gap: 0.75rem; }
+    .gap-4 { gap: 1rem; }
+    .gap-6 { gap: 1.5rem; }
+    .w-full { width: 100%; }
+    .max-w-md { max-width: 28rem; }
+    .max-w-sm { max-width: 24rem; }
+    .max-w-7xl { max-width: 80rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .my-auto { margin-top: auto; margin-bottom: auto; }
+    .p-1 { padding: 0.25rem; }
+    .p-1\.5 { padding: 0.375rem; }
+    .p-2 { padding: 0.5rem; }
+    .p-3 { padding: 0.75rem; }
+    .p-3\.5 { padding: 0.875rem; }
+    .p-4 { padding: 1rem; }
+    .p-5 { padding: 1.25rem; }
+    .p-6 { padding: 1.5rem; }
+    .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .px-3\.5 { padding-left: 0.875rem; padding-right: 0.875rem; }
+    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+    .py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+    .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+    .py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
+    .pt-2 { padding-top: 0.5rem; }
+    .pt-3 { padding-top: 0.75rem; }
+    .pt-6 { padding-top: 1.5rem; }
+    .pb-3 { padding-bottom: 0.75rem; }
+    .pb-24 { padding-bottom: 6rem; }
+    .mt-0\.5 { margin-top: 0.125rem; }
+    .mt-1 { margin-top: 0.25rem; }
+    .mt-1\.5 { margin-top: 0.375rem; }
+    .mt-2 { margin-top: 0.5rem; }
+    .mt-3 { margin-top: 0.75rem; }
+    .mt-4 { margin-top: 1rem; }
+    .mt-6 { margin-top: 1.5rem; }
+    .mb-1 { margin-bottom: 0.25rem; }
+    .mb-1\.5 { margin-bottom: 0.375rem; }
+    .mb-3 { margin-bottom: 0.75rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-5 { margin-bottom: 1.25rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .space-y-2 > * + * { margin-top: 0.5rem; }
+    .space-y-2\.5 > * + * { margin-top: 0.625rem; }
+    .space-y-3 > * + * { margin-top: 0.75rem; }
+    .space-y-4 > * + * { margin-top: 1rem; }
+    .space-y-6 > * + * { margin-top: 1.5rem; }
+    .rounded-lg { border-radius: 0.5rem; }
+    .rounded-xl { border-radius: 0.75rem; }
+    .rounded-2xl { border-radius: 1rem; }
+    .rounded-3xl { border-radius: 1.5rem; }
+    .rounded-full { border-radius: 9999px; }
+    .fixed { position: fixed; }
+    .sticky { position: sticky; }
+    .relative { position: relative; }
+    .inset-0 { inset: 0; }
+    .inset-x-0 { left: 0; right: 0; }
+    .top-0 { top: 0; }
+    .top-4 { top: 1rem; }
+    .right-4 { right: 1rem; }
+    .bottom-0 { bottom: 0; }
+    .z-30 { z-index: 30; }
+    .z-50 { z-index: 50; }
+    .z-\[60\] { z-index: 60; }
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    .text-right { text-align: right; }
+    .text-\[10px\] { font-size: 0.625rem; }
+    .text-\[11px\] { font-size: 0.6875rem; }
+    .text-xs { font-size: 0.75rem; }
+    .text-sm { font-size: 0.875rem; }
+    .text-base { font-size: 1rem; }
+    .text-lg { font-size: 1.125rem; }
+    .text-xl { font-size: 1.25rem; }
+    .text-2xl { font-size: 1.5rem; }
+    .font-medium { font-weight: 500; }
+    .font-semibold { font-weight: 600; }
+    .font-bold { font-weight: 700; }
+    .font-extrabold { font-weight: 800; }
+    .uppercase { text-transform: uppercase; }
+    .tracking-wider { letter-spacing: 0.05em; }
+    .tracking-widest { letter-spacing: 0.1em; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .shrink-0 { flex-shrink: 0; }
+    .cursor-pointer { cursor: pointer; }
+    .transition-all { transition: all 0.18s ease; }
+
+    /* Cores personalizadas */
+    .bg-obsidian { background-color: var(--bg-obsidian); }
+    .bg-graphite { background-color: var(--bg-graphite); }
+    .bg-charcoal { background-color: var(--bg-charcoal); }
+    .bg-gold { background-color: var(--gold); }
+    .text-obsidian { color: var(--bg-obsidian); }
+    .text-white { color: var(--text-white); }
+    .text-gold { color: var(--gold); }
+    .text-gold-light { color: var(--gold-light); }
+    .text-gray-200 { color: #E4E4E7; }
+    .text-gray-300 { color: #D4D4D8; }
+    .text-gray-400 { color: #A1A1AA; }
+    .text-gray-500 { color: #71717A; }
+    .text-emerald-400 { color: var(--emerald); }
+    .text-amber-400 { color: var(--amber); }
+    .text-red-400 { color: var(--red); }
+    .border-slateborder { border-color: var(--border-subtle); }
+
+    /* Inputs e Botões Nativos */
+    input, select, button {
+      font-family: inherit;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      background: transparent;
+    }
+    input, select {
+      background-color: var(--bg-obsidian);
+      color: var(--text-white);
+      border: 1px solid var(--border-subtle);
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.18);
+    }
+
+    /* Gradiente e Bordas Douradas */
+    .gold-gradient {
+      background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #B5952F 100%);
+      color: #09090B;
+    }
+    .gold-card-border {
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.75), 0 0 20px rgba(212, 175, 55, 0.06);
+    }
+    .subtle-border {
+      border: 1px solid var(--border-subtle);
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.85) sepia(0.5) saturate(2.5) hue-rotate(10deg);
+      cursor: pointer;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #09090B; }
+    ::-webkit-scrollbar-thumb { background: #27272E; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+
+    /* Responsividade Desktop */
+    @media (min-width: 640px) {
+      .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .sm\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .sm\:flex-row { flex-direction: row; }
+      .sm\:items-center { align-items: center; }
+      .sm\:justify-between { justify-content: space-between; }
+      .sm\:p-5 { padding: 1.25rem; }
+      .sm\:p-6 { padding: 1.5rem; }
+      .sm\:p-8 { padding: 2rem; }
+      .sm\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .sm\:text-xl { font-size: 1.25rem; }
+      .sm\:text-2xl { font-size: 1.5rem; }
+      .sm\:text-3xl { font-size: 1.875rem; }
+      .sm\:inline { display: inline; }
+    }
+
+    @media (min-width: 768px) {
+      .md\:flex { display: flex !important; }
+      .md\:hidden { display: none !important; }
+      .md\:pb-8 { padding-bottom: 2rem; }
+    }
+
+    @media (min-width: 1024px) {
+      .lg\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .lg\:col-span-2 { grid-column: span 2 / span 2; }
+      .lg\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+    }
+
+    .tab-panel {
+      animation: fadeIn 0.2s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col pb-24 md:pb-8">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-[60] flex flex-col gap-2 pointer-events-none max-w-xs w-full"></div>
+
+  <!-- ==================== TELA 0: LOGIN / CRIAÇÃO DE CONTA LOCAL (100% OFFLINE) ==================== -->
+  <section id="auth-screen" class="fixed inset-0 z-50 bg-obsidian flex items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-md bg-graphite rounded-3xl gold-card-border p-6 sm:p-8 my-auto shadow-2xl">
+      <!-- Marca -->
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 rounded-2xl gold-gradient flex items-center justify-center text-obsidian shadow-lg mx-auto mb-3">
+          <!-- Ícone Tesoura SVG Inline -->
+          <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+            <line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/>
+            <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+          </svg>
+        </div>
+        <h1 class="font-extrabold text-2xl tracking-tight text-white">
+          MEU <span class="text-gold">FINANCEIRO</span>
+        </h1>
+        <p class="text-[11px] text-gray-400 tracking-widest uppercase font-semibold mt-1">Comissão 50% • 100% Offline no Aparelho</p>
+      </div>
+
+      <!-- Caixa de Erro -->
+      <div id="auth-error-box" class="hidden mb-4 p-3.5 rounded-xl bg-red-500/10 border border-red-500/40 text-red-400 text-xs flex items-center gap-2.5">
+        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="auth-error-text"></span>
+      </div>
+
+      <!-- MODO A: PRIMEIRO ACESSO (CRIAR CONTA LOCAL) -->
+      <form id="register-form" onsubmit="handleLocalRegister(event)" class="hidden space-y-4">
+        <div class="bg-obsidian/80 p-3.5 rounded-xl border border-gold/25 text-center">
+          <p class="text-xs font-semibold text-gold-light">Bem-vindo! Crie seu acesso local</p>
+          <p class="text-[11px] text-gray-400 mt-0.5">Seus dados ficam salvos com segurança neste aparelho.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Seu Nome ou Apelido *</label>
+          <input type="text" id="reg-name" placeholder="Ex: Carlos Barbeiro" required
+            class="w-full rounded-xl px-4 py-3 text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Usuário ou E-mail (Opcional)</label>
+          <input type="text" id="reg-user" placeholder="Ex: carlos.barber"
+            class="w-full rounded-xl px-4 py-3 text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Crie uma Senha ou PIN (4 a 6 dígitos) *</label>
+          <input type="password" id="reg-pass" placeholder="Ex: 1234 ou sua senha" minlength="4" required
+            class="w-full rounded-xl px-4 py-3 text-sm tracking-widest" />
+        </div>
+
+        <label class="flex items-center gap-2.5 cursor-pointer pt-1">
+          <input type="checkbox" id="reg-remember" checked class="w-4 h-4 accent-amber-400 rounded" />
+          <span class="text-xs text-gray-300">Manter sessão conectada neste aparelho</span>
+        </label>
+
+        <button type="submit" class="w-full gold-gradient font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm">
+          <span>Criar Acesso e Entrar</span>
+        </button>
+
+        <div class="pt-2 border-t border-slateborder text-center">
+          <p class="text-[11px] text-gray-400 mb-2">Já tem um arquivo de backup de outro aparelho?</p>
+          <label class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-charcoal hover:bg-obsidian border border-slateborder text-xs font-semibold text-gold cursor-pointer">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Restaurar Backup (.json)</span>
+            <input type="file" accept=".json" onchange="handleImportBackup(event, true)" class="hidden" />
+          </label>
+        </div>
+      </form>
+
+      <!-- MODO B: TELA DE DESBLOQUEIO / LOGIN LOCAL -->
+      <form id="login-form" onsubmit="handleLocalLogin(event)" class="hidden space-y-4">
+        <div class="bg-obsidian/90 p-4 rounded-2xl border border-slateborder flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-gold/15 text-gold flex items-center justify-center font-bold text-base shrink-0" id="login-avatar-initial">
+            B
+          </div>
+          <div class="truncate">
+            <span class="text-[10px] uppercase tracking-wider text-gold font-bold block">Conta Local Protegida</span>
+            <p id="login-display-name" class="text-sm font-bold text-white truncate">Barbeiro</p>
+            <p id="login-display-user" class="text-xs text-gray-400 truncate"></p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Digite sua Senha ou PIN para desbloquear</label>
+          <input type="password" id="login-pass" placeholder="••••••" required
+            class="w-full rounded-xl px-4 py-3.5 text-center text-lg font-bold tracking-widest" />
+        </div>
+
+        <label class="flex items-center gap-2.5 cursor-pointer">
+          <input type="checkbox" id="login-remember" class="w-4 h-4 accent-amber-400 rounded" />
+          <span class="text-xs text-gray-300">Lembrar sessão (não pedir PIN ao abrir)</span>
+        </label>
+
+        <button type="submit" class="w-full gold-gradient font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Desbloquear Painel</span>
+        </button>
+
+        <div class="pt-3 border-t border-slateborder flex items-center justify-between text-[11px] text-gray-400">
+          <label class="text-gold hover:underline cursor-pointer font-semibold">
+            Importar Backup (.json)
+            <input type="file" accept=".json" onchange="handleImportBackup(event, true)" class="hidden" />
+          </label>
+          <button type="button" onclick="openResetAccountModal()" class="text-gray-400 hover:text-red-400">
+            Esqueci a senha / Nova conta
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ==================== APP SHELL (PAINEL PRINCIPAL) ==================== -->
+  <div id="app-shell" class="hidden flex-1 flex flex-col">
+
+    <!-- Cabeçalho Superior -->
+    <header class="sticky top-0 z-30 bg-obsidian/95 border-b border-slateborder">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+        <!-- Logo -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl gold-gradient flex items-center justify-center text-obsidian shrink-0">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+              <line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/>
+              <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-white">
+              MEU <span class="text-gold">FINANCEIRO</span>
+            </h1>
+            <p class="text-[10px] text-gray-400 tracking-wider uppercase font-semibold">Comissão 50% • Offline</p>
+          </div>
+        </div>
+
+        <!-- Navegação Desktop -->
+        <nav class="hidden md:flex items-center gap-1.5 bg-graphite p-1.5 rounded-2xl subtle-border">
+          <button onclick="switchTab('dashboard')" data-nav="dashboard" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all">Dashboard</button>
+          <button onclick="switchTab('lancamentos')" data-nav="lancamentos" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all">Lançar</button>
+          <button onclick="switchTab('historico')" data-nav="historico" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all">Histórico</button>
+          <button onclick="switchTab('relatorios')" data-nav="relatorios" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all">Relatórios</button>
+        </nav>
+
+        <!-- Perfil, Backup e Bloqueio -->
+        <div class="flex items-center gap-2">
+          <!-- Botão Perfil / Configurações -->
+          <button onclick="openProfileModal()" title="Perfil e Segurança" class="flex items-center gap-2 bg-graphite hover:bg-charcoal px-2.5 sm:px-3 py-1.5 rounded-xl subtle-border transition-all max-w-[145px] sm:max-w-[200px]">
+            <div class="w-6 h-6 rounded-lg bg-gold/15 text-gold flex items-center justify-center font-bold text-xs shrink-0" id="header-avatar">B</div>
+            <div class="text-left truncate">
+              <p id="header-user-name" class="text-xs font-bold text-white truncate">Barbeiro</p>
+              <p class="text-[10px] text-emerald-400 font-medium">Salvo local</p>
+            </div>
+          </button>
+
+          <!-- Botão Backup / Dados -->
+          <button onclick="openBackupModal()" title="Exportar ou Importar Backup" class="px-2.5 sm:px-3 py-2 rounded-xl bg-graphite hover:bg-charcoal text-xs font-semibold text-gold subtle-border flex items-center gap-1.5">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span class="hidden sm:inline">Backup</span>
+          </button>
+
+          <!-- Botão Bloquear / Sair -->
+          <button onclick="handleLockScreen()" title="Bloquear Tela" class="px-2.5 sm:px-3 py-2 rounded-xl bg-graphite hover:bg-charcoal text-xs font-semibold text-gray-300 hover:text-amber-400 subtle-border flex items-center gap-1.5">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span class="hidden sm:inline">Bloquear</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+
+      <!-- ==================== ABA 1: DASHBOARD ==================== -->
+      <section id="view-dashboard" class="tab-panel space-y-6">
+
+        <!-- Filtro de Período & Quitar Pendentes -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-graphite p-4 sm:p-5 rounded-2xl subtle-border">
+          <div>
+            <span class="text-[11px] uppercase tracking-widest text-gold font-bold">Visão Geral</span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-white mt-0.5">Resumo Financeiro</h2>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="flex bg-obsidian p-1 rounded-xl subtle-border text-xs font-bold">
+              <button onclick="setDashboardPeriod('all')" data-dash-period="all" class="dash-period-btn px-3 py-1.5 rounded-lg transition-all">Geral</button>
+              <button onclick="setDashboardPeriod('day')" data-dash-period="day" class="dash-period-btn px-3 py-1.5 rounded-lg transition-all">Hoje</button>
+              <button onclick="setDashboardPeriod('week')" data-dash-period="week" class="dash-period-btn px-3 py-1.5 rounded-lg transition-all">Semana</button>
+              <button onclick="setDashboardPeriod('month')" data-dash-period="month" class="dash-period-btn px-3 py-1.5 rounded-lg transition-all">Mês</button>
+            </div>
+
+            <button onclick="openSettleModal()" class="px-3.5 py-2 rounded-xl bg-gold/15 hover:bg-gold/25 text-gold border border-gold/30 text-xs font-bold transition-all flex items-center gap-1.5">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Receber Pendentes</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 6 Cards de KPI -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- 1. Ganhos Brutos -->
+          <div class="bg-graphite p-5 rounded-2xl subtle-border">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Ganhos Brutos</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-charcoal text-gray-300">100%</span>
+            </div>
+            <p id="kpi-gross" class="text-2xl sm:text-3xl font-extrabold text-white mt-3">R$ 0,00</p>
+            <p id="kpi-gross-count" class="text-xs text-gray-400 mt-1.5">0 registros de ganho</p>
+          </div>
+
+          <!-- 2. Comissão de 50% -->
+          <div class="bg-graphite p-5 rounded-2xl gold-card-border">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-gold">Comissão (50%)</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-gold/15 text-gold">50%</span>
+            </div>
+            <p id="kpi-commission" class="text-2xl sm:text-3xl font-extrabold text-gold mt-3">R$ 0,00</p>
+            <p class="text-xs text-gray-400 mt-1.5">Cálculo automático sobre os ganhos</p>
+          </div>
+
+          <!-- 3. Total de Descontos -->
+          <div class="bg-graphite p-5 rounded-2xl subtle-border">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Total de Descontos</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-red-500/10 text-red-400">-</span>
+            </div>
+            <p id="kpi-discounts" class="text-2xl sm:text-3xl font-extrabold text-red-400 mt-3">R$ 0,00</p>
+            <p id="kpi-discounts-count" class="text-xs text-gray-400 mt-1.5">0 descontos lançados</p>
+          </div>
+
+          <!-- 4. Saldo Líquido -->
+          <div class="bg-charcoal p-5 rounded-2xl gold-card-border">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-gold-light">Saldo Líquido</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded-md gold-gradient">Líquido</span>
+            </div>
+            <p id="kpi-net" class="text-2xl sm:text-3xl font-extrabold text-white mt-3">R$ 0,00</p>
+            <p class="text-xs text-gray-400 mt-1.5">Comissão (50%) menos Descontos</p>
+          </div>
+
+          <!-- 5. Total Recebido -->
+          <div class="bg-graphite p-5 rounded-2xl subtle-border">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Total Recebido</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400">Pago</span>
+            </div>
+            <p id="kpi-received" class="text-2xl sm:text-3xl font-extrabold text-emerald-400 mt-3">R$ 0,00</p>
+            <p class="text-xs text-gray-400 mt-1.5">Comissões já recebidas</p>
+          </div>
+
+          <!-- 6. Total Pendente -->
+          <div class="bg-graphite p-5 rounded-2xl subtle-border">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Total Pendente</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400">A receber</span>
+            </div>
+            <p id="kpi-pending" class="text-2xl sm:text-3xl font-extrabold text-amber-400 mt-3">R$ 0,00</p>
+            <p id="kpi-pending-liquid" class="text-xs text-gray-400 mt-1.5">Líquido pendente: R$ 0,00</p>
+          </div>
+        </div>
+
+        <!-- Formulários Rápidos no Dashboard -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Novo Ganho -->
+          <div class="bg-graphite p-5 sm:p-6 rounded-2xl subtle-border">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-base sm:text-lg text-white">Novo Ganho Diário</h3>
+              <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-gold/10 text-gold border border-gold/25">50% Automático</span>
+            </div>
+
+            <form onsubmit="handleAddEarning(event, 'dash')" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-400 mb-1.5">Valor Ganho (R$) *</label>
+                  <input type="text" inputmode="decimal" id="dash-earn-amount" oninput="updateLiveCommission('dash')" placeholder="0,00" required
+                    class="w-full rounded-xl px-3.5 py-2.5 font-bold text-base" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-400 mb-1.5">Data *</label>
+                  <input type="date" id="dash-earn-date" required class="w-full rounded-xl px-3.5 py-2.5 text-sm" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-400 mb-1.5">Descrição (Opcional)</label>
+                  <input type="text" id="dash-earn-desc" placeholder="Ex: Corte + Barba, Fechamento..."
+                    class="w-full rounded-xl px-3.5 py-2.5 text-sm" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-400 mb-1.5">Pagamento</label>
+                  <select id="dash-earn-status" class="w-full rounded-xl px-3.5 py-2.5 text-sm">
+                    <option value="pendente">Pendente (A receber)</option>
+                    <option value="recebido">Recebido (Já pago)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between bg-obsidian px-4 py-3 rounded-xl border border-gold/25">
+                <span class="text-xs text-gray-300 font-medium">Comissão Automática (50%):</span>
+                <span id="dash-earn-preview" class="font-extrabold text-base text-gold">R$ 0,00</span>
+              </div>
+
+              <button type="submit" class="w-full gold-gradient font-bold py-3 rounded-xl shadow-lg text-sm">
+                + Registrar Ganho
+              </button>
+            </form>
+          </div>
+
+          <!-- Novo Desconto -->
+          <div class="bg-graphite p-5 sm:p-6 rounded-2xl subtle-border">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-base sm:text-lg text-white">Novo Desconto / Vale</h3>
+              <span class="text-xs text-gray-400">Abate do saldo líquido</span>
+            </div>
+
+            <form onsubmit="handleAddDiscount(event, 'dash')" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-400 mb-1.5">Valor do Desconto (R$) *</label>
+                  <input type="text" inputmode="decimal" id="dash-disc-amount" placeholder="0,00" required
+                    class="w-full rounded-xl px-3.5 py-2.5 font-bold text-base" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-400 mb-1.5">Data *</label>
+                  <input type="date" id="dash-disc-date" required class="w-full rounded-xl px-3.5 py-2.5 text-sm" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-400 mb-1.5">Categoria *</label>
+                  <select id="dash-disc-category" required class="w-full rounded-xl px-3.5 py-2.5 text-sm">
+                    <option value="Adiantamento">Adiantamento</option>
+                    <option value="Alimentação">Alimentação</option>
+                    <option value="Produtos">Produtos</option>
+                    <option value="Outros">Outros</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-400 mb-1.5">Descrição *</label>
+                  <input type="text" id="dash-disc-desc" placeholder="Ex: Almoço, Vale, Pomada..." required
+                    class="w-full rounded-xl px-3.5 py-2.5 text-sm" />
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between bg-obsidian px-4 py-3 rounded-xl subtle-border">
+                <span class="text-xs text-gray-400">Impacto no Saldo:</span>
+                <span class="text-xs font-semibold text-red-400">Dedução imediata de 100% do valor</span>
+              </div>
+
+              <button type="submit" class="w-full bg-charcoal hover:bg-obsidian border border-slateborder text-white font-bold py-3 rounded-xl text-sm">
+                - Registrar Desconto
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Últimas Movimentações -->
+        <div class="bg-graphite p-5 sm:p-6 rounded-2xl subtle-border">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-base sm:text-lg text-white">Últimas Movimentações</h3>
+              <p class="text-xs text-gray-400">Toque no status para alternar entre Pendente e Recebido</p>
+            </div>
+            <button onclick="switchTab('historico')" class="text-xs font-bold text-gold hover:underline">
+              Ver tudo →
+            </button>
+          </div>
+
+          <div id="recent-transactions-list" class="space-y-2.5"></div>
+        </div>
+      </section>
+
+      <!-- ==================== ABA 2: LANÇAMENTOS ==================== -->
+      <section id="view-lancamentos" class="tab-panel hidden space-y-6">
+        <div class="bg-graphite p-5 rounded-2xl subtle-border">
+          <span class="text-[11px] uppercase tracking-widest text-gold font-bold">Registro Rápido</span>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-white mt-0.5">Ganhos & Descontos</h2>
+          <p class="text-xs text-gray-400 mt-1">Lance quantos atendimentos ou fechamentos quiser no mesmo dia.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Form Ganhos -->
+          <div class="bg-graphite p-6 rounded-2xl gold-card-border">
+            <h3 class="font-bold text-lg text-white mb-1">Lançar Ganho Diário</h3>
+            <p class="text-xs text-gray-400 mb-5">Cálculo automático de 50% de comissão</p>
+
+            <form onsubmit="handleAddEarning(event, 'tab')" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Data *</label>
+                <input type="date" id="tab-earn-date" required class="w-full rounded-xl px-4 py-3 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Valor Ganho (R$) *</label>
+                <input type="text" inputmode="decimal" id="tab-earn-amount" oninput="updateLiveCommission('tab')" placeholder="Ex: 180,00" required
+                  class="w-full rounded-xl px-4 py-3 font-extrabold text-lg" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Descrição</label>
+                <input type="text" id="tab-earn-desc" placeholder="Ex: Corte degradê, Barba..."
+                  class="w-full rounded-xl px-4 py-3 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Status do Pagamento</label>
+                <select id="tab-earn-status" class="w-full rounded-xl px-4 py-3 text-sm">
+                  <option value="pendente">Pendente (A receber)</option>
+                  <option value="recebido">Recebido (Já pago)</option>
+                </select>
+              </div>
+              <div class="bg-obsidian p-4 rounded-xl border border-gold/30 flex items-center justify-between">
+                <span class="text-xs text-gray-300">Sua Comissão (50%):</span>
+                <span id="tab-earn-preview" class="font-extrabold text-xl text-gold">R$ 0,00</span>
+              </div>
+              <button type="submit" class="w-full gold-gradient font-bold py-3.5 rounded-xl shadow-lg text-sm">
+                Salvar Ganho
+              </button>
+            </form>
+          </div>
+
+          <!-- Form Descontos -->
+          <div class="bg-graphite p-6 rounded-2xl subtle-border">
+            <h3 class="font-bold text-lg text-white mb-1">Lançar Desconto</h3>
+            <p class="text-xs text-gray-400 mb-5">Adiantamento, alimentação, produtos e outros</p>
+
+            <form onsubmit="handleAddDiscount(event, 'tab')" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Data *</label>
+                <input type="date" id="tab-disc-date" required class="w-full rounded-xl px-4 py-3 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Valor do Desconto (R$) *</label>
+                <input type="text" inputmode="decimal" id="tab-disc-amount" placeholder="Ex: 25,00" required
+                  class="w-full rounded-xl px-4 py-3 font-extrabold text-lg" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Categoria *</label>
+                <select id="tab-disc-category" required class="w-full rounded-xl px-4 py-3 text-sm">
+                  <option value="Adiantamento">Adiantamento</option>
+                  <option value="Alimentação">Alimentação</option>
+                  <option value="Produtos">Produtos</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Descrição *</label>
+                <input type="text" id="tab-disc-desc" placeholder="Ex: Marmita, Vale sexta, Lâminas..." required
+                  class="w-full rounded-xl px-4 py-3 text-sm" />
+              </div>
+              <button type="submit" class="w-full bg-charcoal hover:bg-obsidian border border-slateborder text-white font-bold py-3.5 rounded-xl text-sm">
+                Salvar Desconto
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== ABA 3: HISTÓRICO ==================== -->
+      <section id="view-historico" class="tab-panel hidden space-y-6">
+        <div class="bg-graphite p-5 rounded-2xl subtle-border space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <span class="text-[11px] uppercase tracking-widest text-gold font-bold">Registros</span>
+              <h2 class="text-xl sm:text-2xl font-extrabold text-white mt-0.5">Histórico Financeiro</h2>
+            </div>
+
+            <div class="flex flex-wrap bg-obsidian p-1 rounded-xl subtle-border text-xs font-bold">
+              <button onclick="setHistoryFilter('all')" data-hist-period="all" class="hist-period-btn px-3 py-1.5 rounded-lg">Todos</button>
+              <button onclick="setHistoryFilter('day')" data-hist-period="day" class="hist-period-btn px-3 py-1.5 rounded-lg">Dia (Hoje)</button>
+              <button onclick="setHistoryFilter('week')" data-hist-period="week" class="hist-period-btn px-3 py-1.5 rounded-lg">Semana</button>
+              <button onclick="setHistoryFilter('month')" data-hist-period="month" class="hist-period-btn px-3 py-1.5 rounded-lg">Mês</button>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 pt-3 border-t border-slateborder">
+            <div class="flex items-center gap-2">
+              <label class="text-xs text-gray-400">Data específica:</label>
+              <input type="date" id="hist-custom-date" onchange="setHistoryCustomDate(this.value)" class="rounded-lg px-2.5 py-1.5 text-xs" />
+              <button id="hist-clear-date" onclick="clearHistoryCustomDate()" class="hidden text-xs text-gold font-bold">Limpar</button>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="text-xs text-gray-400">Status:</label>
+              <select id="hist-status-filter" onchange="renderHistory()" class="rounded-lg px-2.5 py-1.5 text-xs">
+                <option value="all">Todos</option>
+                <option value="pendente">Pendentes</option>
+                <option value="recebido">Recebidos</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Totais do Filtro -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="bg-graphite px-4 py-3 rounded-xl subtle-border">
+            <span class="text-[11px] text-gray-400 block">Bruto Filtrado</span>
+            <span id="hist-sum-gross" class="font-extrabold text-sm sm:text-base text-white">R$ 0,00</span>
+          </div>
+          <div class="bg-graphite px-4 py-3 rounded-xl subtle-border">
+            <span class="text-[11px] text-gold block">Comissão (50%)</span>
+            <span id="hist-sum-comm" class="font-extrabold text-sm sm:text-base text-gold">R$ 0,00</span>
+          </div>
+          <div class="bg-graphite px-4 py-3 rounded-xl subtle-border">
+            <span class="text-[11px] text-red-400 block">Descontos</span>
+            <span id="hist-sum-disc" class="font-extrabold text-sm sm:text-base text-red-400">R$ 0,00</span>
+          </div>
+          <div class="bg-graphite px-4 py-3 rounded-xl gold-card-border">
+            <span class="text-[11px] text-gold-light block">Líquido Filtrado</span>
+            <span id="hist-sum-net" class="font-extrabold text-sm sm:text-base text-white">R$ 0,00</span>
+          </div>
+        </div>
+
+        <!-- Colunas Ganhos e Descontos -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-graphite p-5 rounded-2xl subtle-border">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slateborder">
+              <h3 class="font-bold text-base text-white">Ganhos Registrados</h3>
+              <span id="hist-earn-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-charcoal text-gold">0</span>
+            </div>
+            <div id="history-earnings-list" class="space-y-3"></div>
+          </div>
+
+          <div class="bg-graphite p-5 rounded-2xl subtle-border">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slateborder">
+              <h3 class="font-bold text-base text-white">Descontos Registrados</h3>
+              <span id="hist-disc-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-charcoal text-red-400">0</span>
+            </div>
+            <div id="history-discounts-list" class="space-y-3"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== ABA 4: RELATÓRIOS & GRÁFICOS NATIVOS ==================== -->
+      <section id="view-relatorios" class="tab-panel hidden space-y-6">
+        <div class="bg-graphite p-5 rounded-2xl subtle-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span class="text-[11px] uppercase tracking-widest text-gold font-bold">Análise Offline</span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-white mt-0.5">Relatórios Financeiros</h2>
+          </div>
+
+          <div class="flex flex-wrap bg-obsidian p-1 rounded-xl subtle-border text-xs font-bold">
+            <button onclick="setReportPeriod('daily')" data-rep-period="daily" class="rep-period-btn px-3.5 py-2 rounded-lg">Diário</button>
+            <button onclick="setReportPeriod('weekly')" data-rep-period="weekly" class="rep-period-btn px-3.5 py-2 rounded-lg">Semanal</button>
+            <button onclick="setReportPeriod('monthly')" data-rep-period="monthly" class="rep-period-btn px-3.5 py-2 rounded-lg">Mensal</button>
+            <button onclick="setReportPeriod('annual')" data-rep-period="annual" class="rep-period-btn px-3.5 py-2 rounded-lg">Anual</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-graphite p-4 sm:p-5 rounded-2xl subtle-border">
+            <span class="text-xs text-gray-400">Faturamento Bruto</span>
+            <p id="rep-gross" class="text-xl sm:text-2xl font-extrabold text-white mt-1">R$ 0,00</p>
+          </div>
+          <div class="bg-graphite p-4 sm:p-5 rounded-2xl gold-card-border">
+            <span class="text-xs text-gold">Comissão (50%)</span>
+            <p id="rep-comm" class="text-xl sm:text-2xl font-extrabold text-gold mt-1">R$ 0,00</p>
+          </div>
+          <div class="bg-graphite p-4 sm:p-5 rounded-2xl subtle-border">
+            <span class="text-xs text-red-400">Descontos</span>
+            <p id="rep-disc" class="text-xl sm:text-2xl font-extrabold text-red-400 mt-1">R$ 0,00</p>
+          </div>
+          <div class="bg-graphite p-4 sm:p-5 rounded-2xl subtle-border">
+            <span class="text-xs text-emerald-400">Lucro Líquido</span>
+            <p id="rep-net" class="text-xl sm:text-2xl font-extrabold text-emerald-400 mt-1">R$ 0,00</p>
+          </div>
+        </div>
+
+        <!-- Gráficos em Canvas Puro (100% sem internet) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-graphite p-5 sm:p-6 rounded-2xl subtle-border">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div>
+                <h3 id="rep-chart-title" class="font-bold text-base sm:text-lg text-white">Evolução de Ganhos e Descontos</h3>
+                <p id="rep-chart-subtitle" class="text-xs text-gray-400">Comparativo de Comissão (50%) vs Descontos</p>
+              </div>
+              <div class="flex items-center gap-3 text-[11px] font-semibold">
+                <span class="flex items-center gap-1.5 text-gold"><span class="w-2.5 h-2.5 rounded-full bg-gold inline-block"></span>Comissão 50%</span>
+                <span class="flex items-center gap-1.5 text-red-400"><span class="w-2.5 h-2.5 rounded-full inline-block" style="background:#F87171"></span>Descontos</span>
+              </div>
+            </div>
+            <div class="w-full" style="height: 290px;">
+              <canvas id="nativeBarCanvas" class="w-full rounded-xl"></canvas>
+            </div>
+          </div>
+
+          <div class="bg-graphite p-5 sm:p-6 rounded-2xl subtle-border flex flex-col">
+            <h3 class="font-bold text-base sm:text-lg text-white">Descontos por Categoria</h3>
+            <p class="text-xs text-gray-400 mb-4">Distribuição no período selecionado</p>
+            <div class="flex items-center justify-center my-auto" style="height: 200px;">
+              <canvas id="nativeDonutCanvas" class="w-full"></canvas>
+            </div>
+            <div id="category-breakdown-list" class="mt-4 pt-3 border-t border-slateborder space-y-2 text-xs"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Barra de Navegação Inferior Mobile -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 bg-graphite border-t border-slateborder px-2 py-2 flex items-center justify-around">
+      <button onclick="switchTab('dashboard')" data-nav="dashboard" class="mobile-nav-btn flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-xs font-bold">
+        <span>Início</span>
+      </button>
+      <button onclick="switchTab('lancamentos')" data-nav="lancamentos" class="mobile-nav-btn flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-xs font-bold">
+        <span>Lançar</span>
+      </button>
+      <button onclick="switchTab('historico')" data-nav="historico" class="mobile-nav-btn flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-xs font-bold">
+        <span>Histórico</span>
+      </button>
+      <button onclick="switchTab('relatorios')" data-nav="relatorios" class="mobile-nav-btn flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-xs font-bold">
+        <span>Relatórios</span>
+      </button>
+    </nav>
+
+  </div> <!-- Fim #app-shell -->
+
+  <!-- ==================== MODAL: BACKUP E RESTAURAÇÃO (.JSON) ==================== -->
+  <div id="modal-backup" class="fixed inset-0 z-50 hidden bg-obsidian/90 flex items-center justify-center p-4">
+    <div class="bg-graphite border border-gold/30 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-[10px] uppercase tracking-widest text-gold font-bold">Transferência sem Servidor</span>
+          <h3 class="font-extrabold text-lg text-white">Backup & Restauração</h3>
+        </div>
+        <button onclick="closeModal('modal-backup')" class="text-gray-400 hover:text-white text-lg font-bold px-2">✕</button>
+      </div>
+
+      <p class="text-xs text-gray-300 leading-relaxed">
+        Como o sistema funciona <strong>100% offline no aparelho</strong>, use os botões abaixo para salvar uma cópia de segurança ou transferir seus dados entre celular e computador (via WhatsApp, E-mail ou cabo).
+      </p>
+
+      <div class="space-y-3">
+        <!-- Exportar JSON -->
+        <button onclick="handleExportBackup()" class="w-full gold-gradient font-bold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Exportar Backup (.json)</span>
+        </button>
+
+        <!-- Importar JSON -->
+        <label class="w-full bg-charcoal hover:bg-obsidian border border-slateborder text-white font-bold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 cursor-pointer">
+          <svg class="w-4 h-4 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Importar Backup (.json)</span>
+          <input type="file" accept=".json" onchange="handleImportBackup(event, false)" class="hidden" />
+        </label>
+      </div>
+
+      <div class="pt-3 border-t border-slateborder flex flex-col gap-2">
+        <button onclick="loadDemoData()" class="w-full py-2.5 px-3 rounded-xl bg-obsidian hover:bg-charcoal border border-slateborder text-xs font-semibold text-gold">
+          Carregar Dados de Exemplo (Teste)
+        </button>
+        <button onclick="clearAllFinancialData()" class="w-full py-2.5 px-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs font-semibold text-red-400">
+          Limpar Todos os Lançamentos
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: PERFIL & ALTERAR SENHA/PIN ==================== -->
+  <div id="modal-profile" class="fixed inset-0 z-50 hidden bg-obsidian/90 flex items-center justify-center p-4">
+    <div class="bg-graphite border border-gold/30 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-extrabold text-lg text-white">Perfil & Segurança Local</h3>
+        <button onclick="closeModal('modal-profile')" class="text-gray-400 hover:text-white text-lg font-bold px-2">✕</button>
+      </div>
+
+      <form onsubmit="handleSaveProfile(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Nome ou Apelido</label>
+          <input type="text" id="prof-name" required class="w-full rounded-xl px-3.5 py-2.5 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Usuário / E-mail (Opcional)</label>
+          <input type="text" id="prof-user" class="w-full rounded-xl px-3.5 py-2.5 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Nova Senha ou PIN (deixe igual para manter)</label>
+          <input type="password" id="prof-pass" minlength="4" required class="w-full rounded-xl px-3.5 py-2.5 text-sm tracking-widest" />
+        </div>
+        <label class="flex items-center gap-2.5 cursor-pointer">
+          <input type="checkbox" id="prof-remember" class="w-4 h-4 accent-amber-400 rounded" />
+          <span class="text-xs text-gray-300">Manter sessão conectada automaticamente</span>
+        </label>
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeModal('modal-profile')" class="flex-1 py-2.5 rounded-xl bg-charcoal text-gray-300 font-bold text-xs">Cancelar</button>
+          <button type="submit" class="flex-1 py-2.5 rounded-xl gold-gradient font-bold text-xs">Salvar Perfil</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: EDITAR GANHO ==================== -->
+  <div id="modal-edit-earning" class="fixed inset-0 z-50 hidden bg-obsidian/90 flex items-center justify-center p-4">
+    <div class="bg-graphite border border-gold/30 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-extrabold text-lg text-white">Editar Ganho</h3>
+        <button onclick="closeModal('modal-edit-earning')" class="text-gray-400 hover:text-white text-lg font-bold px-2">✕</button>
+      </div>
+      <form onsubmit="saveEditedEarning(event)" class="space-y-4">
+        <input type="hidden" id="edit-earn-id" />
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Data</label>
+          <input type="date" id="edit-earn-date" required class="w-full rounded-xl px-3.5 py-2.5 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Valor Ganho (R$)</label>
+          <input type="text" inputmode="decimal" id="edit-earn-amount" oninput="updateEditCommissionPreview()" required class="w-full rounded-xl px-3.5 py-2.5 font-bold text-base" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Descrição</label>
+          <input type="text" id="edit-earn-desc" required class="w-full rounded-xl px-3.5 py-2.5 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Status</label>
+          <select id="edit-earn-status" class="w-full rounded-xl px-3.5 py-2.5 text-sm">
+            <option value="pendente">Pendente</option>
+            <option value="recebido">Recebido</option>
+          </select>
+        </div>
+        <div class="bg-obsidian px-4 py-3 rounded-xl border border-gold/25 flex items-center justify-between">
+          <span class="text-xs text-gray-400">Nova Comissão (50%):</span>
+          <span id="edit-earn-preview" class="font-extrabold text-gold">R$ 0,00</span>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeModal('modal-edit-earning')" class="flex-1 py-2.5 rounded-xl bg-charcoal text-gray-300 font-bold text-xs">Cancelar</button>
+          <button type="submit" class="flex-1 py-2.5 rounded-xl gold-gradient font-bold text-xs">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: EDITAR DESCONTO ==================== -->
+  <div id="modal-edit-discount" class="fixed inset-0 z-50 hidden bg-obsidian/90 flex items-center justify-center p-4">
+    <div class="bg-graphite border border-slateborder rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-extrabold text-lg text-white">Editar Desconto</h3>
+        <button onclick="closeModal('modal-edit-discount')" class="text-gray-400 hover:text-white text-lg font-bold px-2">✕</button>
+      </div>
+      <form onsubmit="saveEditedDiscount(event)" class="space-y-4">
+        <input type="hidden" id="edit-disc-id" />
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Data</label>
+          <input type="date" id="edit-disc-date" required class="w-full rounded-xl px-3.5 py-2.5 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Valor do Desconto (R$)</label>
+          <input type="text" inputmode="decimal" id="edit-disc-amount" required class="w-full rounded-xl px-3.5 py-2.5 font-bold text-base" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Categoria</label>
+          <select id="edit-disc-category" required class="w-full rounded-xl px-3.5 py-2.5 text-sm">
+            <option value="Adiantamento">Adiantamento</option>
+            <option value="Alimentação">Alimentação</option>
+            <option value="Produtos">Produtos</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Descrição</label>
+          <input type="text" id="edit-disc-desc" required class="w-full rounded-xl px-3.5 py-2.5 text-sm" />
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeModal('modal-edit-discount')" class="flex-1 py-2.5 rounded-xl bg-charcoal text-gray-300 font-bold text-xs">Cancelar</button>
+          <button type="submit" class="flex-1 py-2.5 rounded-xl gold-gradient font-bold text-xs">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: CONFIRMAÇÕES (EXCLUSÃO / QUITAR / RESET CONTA) ==================== -->
+  <div id="modal-confirm-action" class="fixed inset-0 z-50 hidden bg-obsidian/90 flex items-center justify-center p-4">
+    <div class="bg-graphite border border-gold/30 rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center">
+      <h3 id="confirm-modal-title" class="font-extrabold text-lg text-white">Confirmar Ação</h3>
+      <p id="confirm-modal-text" class="text-xs text-gray-300 mt-2 leading-relaxed"></p>
+      <div class="flex gap-3 mt-6">
+        <button onclick="closeModal('modal-confirm-action')" class="flex-1 py-2.5 rounded-xl bg-charcoal text-gray-300 font-bold text-xs">Cancelar</button>
+        <button id="confirm-modal-btn" class="flex-1 py-2.5 rounded-xl gold-gradient font-bold text-xs">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT 100% OFFLINE ==================== -->
+  <script>
+    // -------------------------------------------------------------------------
+    // 1. ARMAZENAMENTO LOCAL (100% LOCALSTORAGE, ZERO SERVIDOR)
+    // -------------------------------------------------------------------------
+    const STORAGE_KEY = 'meu_financeiro_offline_v1';
+
+    let appData = {
+      account: null, // { name: string, username: string, password: string, remember: boolean }
+      earnings: [],  // { id, date, gross, commission, description, status }
+      discounts: []  // { id, date, amount, category, description }
+    };
+
+    let isUnlocked = false;
+    let currentTab = 'dashboard';
+    let dashboardPeriod = 'all';
+    let historyPeriod = 'all';
+    let historyCustomDate = '';
+    let reportPeriod = 'weekly';
+
+    function loadAppData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          appData.account = parsed.account || null;
+          appData.earnings = Array.isArray(parsed.earnings) ? parsed.earnings : [];
+          appData.discounts = Array.isArray(parsed.discounts) ? parsed.discounts : [];
+        }
+      } catch (e) {
+        console.error('Erro ao ler localStorage:', e);
+      }
+    }
+
+    function saveAppData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+      } catch (e) {
+        console.error('Erro ao salvar no localStorage:', e);
+        showToast('Aviso: memória cheia no navegador.', 'error');
+      }
+    }
+
+    function generateId() {
+      return Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 8);
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. AUTENTICAÇÃO LOCAL E TELA DE BLOQUEIO
+    // -------------------------------------------------------------------------
+    function showAuthError(msg) {
+      const box = document.getElementById('auth-error-box');
+      document.getElementById('auth-error-text').textContent = msg;
+      box.classList.remove('hidden');
+    }
+
+    function hideAuthError() {
+      document.getElementById('auth-error-box').classList.add('hidden');
+    }
+
+    function renderAuthOrApp() {
+      const authScreen = document.getElementById('auth-screen');
+      const appShell = document.getElementById('app-shell');
+      const regForm = document.getElementById('register-form');
+      const loginForm = document.getElementById('login-form');
+
+      hideAuthError();
+
+      if (!appData.account) {
+        // Primeiro acesso: criar conta local
+        authScreen.classList.remove('hidden');
+        appShell.classList.add('hidden');
+        regForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+        return;
+      }
+
+      // Se "Lembrar sessão" estiver ativo e ainda não bloqueou manualmente
+      if (appData.account.remember && isUnlocked) {
+        enterAppShell();
+        return;
+      }
+
+      if (isUnlocked) {
+        enterAppShell();
+        return;
+      }
+
+      // Mostrar tela de desbloqueio com PIN/Senha
+      authScreen.classList.remove('hidden');
+      appShell.classList.add('hidden');
+      regForm.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+
+      const name = appData.account.name || 'Barbeiro';
+      document.getElementById('login-display-name').textContent = name;
+      document.getElementById('login-avatar-initial').textContent = name.charAt(0).toUpperCase();
+      document.getElementById('login-display-user').textContent = appData.account.username || 'Acesso local no aparelho';
+      document.getElementById('login-remember').checked = Boolean(appData.account.remember);
+      document.getElementById('login-pass').value = '';
+    }
+
+    function enterAppShell() {
+      document.getElementById('auth-screen').classList.add('hidden');
+      document.getElementById('app-shell').classList.remove('hidden');
+
+      const name = appData.account ? appData.account.name : 'Barbeiro';
+      document.getElementById('header-user-name').textContent = name;
+      document.getElementById('header-avatar').textContent = name.charAt(0).toUpperCase();
+
+      refreshAllViews();
+    }
+
+    function handleLocalRegister(event) {
+      event.preventDefault();
+      hideAuthError();
+
+      const name = document.getElementById('reg-name').value.trim();
+      const username = document.getElementById('reg-user').value.trim();
+      const password = document.getElementById('reg-pass').value;
+      const remember = document.getElementById('reg-remember').checked;
+
+      if (!name || password.length < 4) {
+        showAuthError('Preencha seu nome e uma senha/PIN com pelo menos 4 caracteres.');
+        return;
+      }
+
+      appData.account = { name, username, password, remember };
+      saveAppData();
+      isUnlocked = true;
+      enterAppShell();
+      showToast(`Bem-vindo, ${name}! Conta local criada.`);
+    }
+
+    function handleLocalLogin(event) {
+      event.preventDefault();
+      hideAuthError();
+
+      const typedPass = document.getElementById('login-pass').value;
+      const remember = document.getElementById('login-remember').checked;
+
+      if (!appData.account) return;
+
+      if (typedPass !== appData.account.password) {
+        showAuthError('Senha ou PIN incorreto. Tente novamente.');
+        return;
+      }
+
+      appData.account.remember = remember;
+      saveAppData();
+      isUnlocked = true;
+      enterAppShell();
+      showToast('Painel desbloqueado!');
+    }
+
+    function handleLockScreen() {
+      isUnlocked = false;
+      if (appData.account) {
+        appData.account.remember = false;
+        saveAppData();
+      }
+      renderAuthOrApp();
+      showToast('Tela bloqueada.');
+    }
+
+    function openProfileModal() {
+      if (!appData.account) return;
+      document.getElementById('prof-name').value = appData.account.name || '';
+      document.getElementById('prof-user').value = appData.account.username || '';
+      document.getElementById('prof-pass').value = appData.account.password || '';
+      document.getElementById('prof-remember').checked = Boolean(appData.account.remember);
+      openModal('modal-profile');
+    }
+
+    function handleSaveProfile(event) {
+      event.preventDefault();
+      const name = document.getElementById('prof-name').value.trim();
+      const username = document.getElementById('prof-user').value.trim();
+      const password = document.getElementById('prof-pass').value;
+      const remember = document.getElementById('prof-remember').checked;
+
+      if (!name || password.length < 4) {
+        showToast('Senha/PIN deve ter no mínimo 4 caracteres.', 'error');
+        return;
+      }
+
+      appData.account = { name, username, password, remember };
+      saveAppData();
+      closeModal('modal-profile');
+      enterAppShell();
+      showToast('Perfil e senha atualizados!');
+    }
+
+    function openResetAccountModal() {
+      document.getElementById('confirm-modal-title').textContent = 'Redefinir Acesso Local?';
+      document.getElementById('confirm-modal-text').innerHTML =
+        'Isso removerá a senha atual para que você crie um novo acesso. <strong>Seus lançamentos financeiros serão mantidos</strong> neste aparelho.';
+      const btn = document.getElementById('confirm-modal-btn');
+      btn.onclick = () => {
+        appData.account = null;
+        isUnlocked = false;
+        saveAppData();
+        closeModal('modal-confirm-action');
+        renderAuthOrApp();
+        showToast('Acesso redefinido. Crie sua nova senha.');
+      };
+      openModal('modal-confirm-action');
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. BACKUP E RESTAURAÇÃO (.JSON) PARA TRANSFERIR ENTRE APARELHOS
+    // -------------------------------------------------------------------------
+    function openBackupModal() {
+      openModal('modal-backup');
+    }
+
+    function handleExportBackup() {
+      const payload = {
+        app: 'MEU FINANCEIRO - BARBEARIA',
+        exportedAt: new Date().toISOString(),
+        account: appData.account,
+        earnings: appData.earnings,
+        discounts: appData.discounts
+      };
+
+      const jsonStr = JSON.stringify(payload, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `meu-financeiro-backup-${getTodayISO()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showToast('Arquivo de backup (.json) baixado!');
+    }
+
+    function handleImportBackup(event, fromAuthScreen) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!Array.isArray(imported.earnings) || !Array.isArray(imported.discounts)) {
+            throw new Error('Formato inválido');
+          }
+
+          appData.earnings = imported.earnings;
+          appData.discounts = imported.discounts;
+          if (imported.account && imported.account.password) {
+            appData.account = imported.account;
+          }
+
+          saveAppData();
+          event.target.value = '';
+          closeModal('modal-backup');
+
+          if (fromAuthScreen && appData.account) {
+            isUnlocked = true;
+            enterAppShell();
+          } else {
+            refreshAllViews();
+          }
+          showToast('Backup restaurado com sucesso!');
+        } catch (err) {
+          console.error('Erro ao importar backup:', err);
+          showToast('Arquivo de backup inválido.', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function loadDemoData() {
+      const today = parseLocalDate(getTodayISO());
+      const offsetDate = (daysAgo) => {
+        const d = new Date(today);
+        d.setDate(today.getDate() - daysAgo);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      };
+
+      appData.earnings = [
+        { id: generateId(), date: offsetDate(0), gross: 240.00, commission: 120.00, description: '4 Cortes + 2 Barbas', status: 'pendente' },
+        { id: generateId(), date: offsetDate(0), gross: 110.00, commission: 55.00, description: 'Corte Degradê + Sobrancelha', status: 'recebido' },
+        { id: generateId(), date: offsetDate(1), gross: 320.00, commission: 160.00, description: 'Fechamento do Dia', status: 'pendente' },
+        { id: generateId(), date: offsetDate(2), gross: 280.00, commission: 140.00, description: 'Atendimentos Diversos', status: 'recebido' },
+        { id: generateId(), date: offsetDate(4), gross: 420.00, commission: 210.00, description: 'Movimento de Sábado', status: 'recebido' }
+      ];
+
+      appData.discounts = [
+        { id: generateId(), date: offsetDate(0), amount: 25.00, category: 'Alimentação', description: 'Almoço e café' },
+        { id: generateId(), date: offsetDate(1), amount: 50.00, category: 'Adiantamento', description: 'Vale semanal' },
+        { id: generateId(), date: offsetDate(2), amount: 35.00, category: 'Produtos', description: 'Pomada e lâminas' }
+      ];
+
+      saveAppData();
+      closeModal('modal-backup');
+      refreshAllViews();
+      showToast('Dados de exemplo carregados!');
+    }
+
+    function clearAllFinancialData() {
+      closeModal('modal-backup');
+      document.getElementById('confirm-modal-title').textContent = 'Apagar Todos os Lançamentos?';
+      document.getElementById('confirm-modal-text').textContent =
+        'Todos os ganhos e descontos serão removidos deste aparelho. Recomendamos exportar um backup antes.';
+      const btn = document.getElementById('confirm-modal-btn');
+      btn.onclick = () => {
+        appData.earnings = [];
+        appData.discounts = [];
+        saveAppData();
+        closeModal('modal-confirm-action');
+        refreshAllViews();
+        showToast('Lançamentos apagados.');
+      };
+      openModal('modal-confirm-action');
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. UTILITÁRIOS (MOEDA BRL, DATAS, TOAST, ESCAPE)
+    // -------------------------------------------------------------------------
+    const brlFormatter = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+
+    function formatBRL(value) {
+      return brlFormatter.format(Number(value) || 0);
+    }
+
+    function parseCurrencyInput(str) {
+      if (typeof str === 'number') return str;
+      if (!str) return 0;
+      let clean = String(str).trim().replace(/[R$\s]/g, '');
+      if (clean.includes(',') && clean.includes('.')) {
+        clean = clean.replace(/\./g, '').replace(',', '.');
+      } else if (clean.includes(',')) {
+        clean = clean.replace(',', '.');
+      }
+      const val = parseFloat(clean);
+      return isNaN(val) ? 0 : Math.round(val * 100) / 100;
+    }
+
+    function getTodayISO() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    function formatDateBR(isoDate) {
+      if (!isoDate) return '';
+      const [y, m, d] = isoDate.split('-');
+      return `${d}/${m}/${y}`;
+    }
+
+    function parseLocalDate(isoDate) {
+      const [y, m, d] = isoDate.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function matchesPeriod(isoDate, period) {
+      if (period === 'all') return true;
+      const todayStr = getTodayISO();
+      if (period === 'day') return isoDate === todayStr;
+
+      const target = parseLocalDate(isoDate);
+      const today = parseLocalDate(todayStr);
+
+      if (period === 'week') {
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay());
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        return target >= startOfWeek && target <= endOfWeek;
+      }
+
+      if (period === 'month') {
+        return target.getFullYear() === today.getFullYear() && target.getMonth() === today.getMonth();
+      }
+      return true;
+    }
+
+    function escapeHTML(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const borderColor = type === 'error' ? 'border-red-500/50 text-red-400' : 'border-gold/50 text-white';
+      toast.className = `bg-charcoal border ${borderColor} px-4 py-3 rounded-xl shadow-2xl text-xs font-bold transition-all`;
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 250);
+      }, 2600);
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. NAVEGAÇÃO E MODAIS
+    // -------------------------------------------------------------------------
+    function switchTab(tabName) {
+      currentTab = tabName;
+
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById(`view-${tabName}`).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.dataset.nav === tabName) {
+          btn.classList.add('bg-gold', 'text-obsidian');
+          btn.classList.remove('text-gray-400');
+        } else {
+          btn.classList.remove('bg-gold', 'text-obsidian');
+          btn.classList.add('text-gray-400');
+        }
+      });
+
+      document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        if (btn.dataset.nav === tabName) {
+          btn.classList.add('bg-gold', 'text-obsidian');
+          btn.classList.remove('text-gray-400');
+        } else {
+          btn.classList.remove('bg-gold', 'text-obsidian');
+          btn.classList.add('text-gray-400');
+        }
+      });
+
+      if (tabName === 'relatorios') renderReports();
+      if (tabName === 'historico') renderHistory();
+      if (tabName === 'dashboard') renderDashboard();
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. CRUD DE GANHOS, DESCONTOS E PAGAMENTOS
+    // -------------------------------------------------------------------------
+    function updateLiveCommission(prefix) {
+      const val = parseCurrencyInput(document.getElementById(`${prefix}-earn-amount`).value);
+      document.getElementById(`${prefix}-earn-preview`).textContent = formatBRL(val * 0.5);
+    }
+
+    function handleAddEarning(event, source) {
+      event.preventDefault();
+      const amountEl = document.getElementById(`${source}-earn-amount`);
+      const dateEl = document.getElementById(`${source}-earn-date`);
+      const descEl = document.getElementById(`${source}-earn-desc`);
+      const statusEl = document.getElementById(`${source}-earn-status`);
+
+      const gross = parseCurrencyInput(amountEl.value);
+      if (gross <= 0) {
+        showToast('Informe um valor válido maior que zero.', 'error');
+        return;
+      }
+
+      const commission = Math.round(gross * 0.5 * 100) / 100;
+      appData.earnings.push({
+        id: generateId(),
+        date: dateEl.value || getTodayISO(),
+        gross,
+        commission,
+        description: descEl.value.trim() || 'Atendimento Barbearia',
+        status: statusEl ? statusEl.value : 'pendente'
+      });
+
+      saveAppData();
+      amountEl.value = '';
+      descEl.value = '';
+      updateLiveCommission(source);
+      refreshAllViews();
+      showToast(`Ganho salvo! Comissão: ${formatBRL(commission)}`);
+    }
+
+    function handleAddDiscount(event, source) {
+      event.preventDefault();
+      const amountEl = document.getElementById(`${source}-disc-amount`);
+      const dateEl = document.getElementById(`${source}-disc-date`);
+      const catEl = document.getElementById(`${source}-disc-category`);
+      const descEl = document.getElementById(`${source}-disc-desc`);
+
+      const amount = parseCurrencyInput(amountEl.value);
+      if (amount <= 0) {
+        showToast('Informe um valor de desconto válido.', 'error');
+        return;
+      }
+
+      appData.discounts.push({
+        id: generateId(),
+        date: dateEl.value || getTodayISO(),
+        amount,
+        category: catEl.value,
+        description: descEl.value.trim() || catEl.value
+      });
+
+      saveAppData();
+      amountEl.value = '';
+      descEl.value = '';
+      refreshAllViews();
+      showToast(`Desconto de ${formatBRL(amount)} registrado.`);
+    }
+
+    function togglePaymentStatus(id) {
+      const item = appData.earnings.find(e => e.id === id);
+      if (!item) return;
+      item.status = item.status === 'recebido' ? 'pendente' : 'recebido';
+      saveAppData();
+      refreshAllViews();
+      showToast(`Status alterado para ${item.status === 'recebido' ? 'Recebido' : 'Pendente'}`);
+    }
+
+    function openSettleModal() {
+      const pending = appData.earnings.filter(e => e.status === 'pendente');
+      if (pending.length === 0) {
+        showToast('Nenhuma comissão pendente no momento.');
+        return;
+      }
+      const total = pending.reduce((s, e) => s + e.commission, 0);
+      document.getElementById('confirm-modal-title').textContent = 'Receber Comissões Pendentes?';
+      document.getElementById('confirm-modal-text').innerHTML =
+        `Você tem <strong>${pending.length}</strong> registro(s) pendente(s) somando <strong class="text-gold">${formatBRL(total)}</strong>. Deseja marcar todos como <strong>Recebidos</strong>?`;
+      const btn = document.getElementById('confirm-modal-btn');
+      btn.onclick = () => {
+        appData.earnings.forEach(e => {
+          if (e.status === 'pendente') e.status = 'recebido';
+        });
+        saveAppData();
+        closeModal('modal-confirm-action');
+        refreshAllViews();
+        showToast('Todas as comissões pendentes foram recebidas!');
+      };
+      openModal('modal-confirm-action');
+    }
+
+    function openEditEarning(id) {
+      const item = appData.earnings.find(e => e.id === id);
+      if (!item) return;
+      document.getElementById('edit-earn-id').value = item.id;
+      document.getElementById('edit-earn-date').value = item.date;
+      document.getElementById('edit-earn-amount').value = item.gross.toFixed(2).replace('.', ',');
+      document.getElementById('edit-earn-desc').value = item.description;
+      document.getElementById('edit-earn-status').value = item.status;
+      updateEditCommissionPreview();
+      openModal('modal-edit-earning');
+    }
+
+    function updateEditCommissionPreview() {
+      const val = parseCurrencyInput(document.getElementById('edit-earn-amount').value);
+      document.getElementById('edit-earn-preview').textContent = formatBRL(val * 0.5);
+    }
+
+    function saveEditedEarning(event) {
+      event.preventDefault();
+      const id = document.getElementById('edit-earn-id').value;
+      const item = appData.earnings.find(e => e.id === id);
+      if (!item) return;
+
+      const gross = parseCurrencyInput(document.getElementById('edit-earn-amount').value);
+      if (gross <= 0) {
+        showToast('Valor inválido.', 'error');
+        return;
+      }
+
+      item.date = document.getElementById('edit-earn-date').value;
+      item.gross = gross;
+      item.commission = Math.round(gross * 0.5 * 100) / 100;
+      item.description = document.getElementById('edit-earn-desc').value.trim() || 'Atendimento Barbearia';
+      item.status = document.getElementById('edit-earn-status').value;
+
+      saveAppData();
+      closeModal('modal-edit-earning');
+      refreshAllViews();
+      showToast('Ganho atualizado!');
+    }
+
+    function openEditDiscount(id) {
+      const item = appData.discounts.find(d => d.id === id);
+      if (!item) return;
+      document.getElementById('edit-disc-id').value = item.id;
+      document.getElementById('edit-disc-date').value = item.date;
+      document.getElementById('edit-disc-amount').value = item.amount.toFixed(2).replace('.', ',');
+      document.getElementById('edit-disc-category').value = item.category;
+      document.getElementById('edit-disc-desc').value = item.description;
+      openModal('modal-edit-discount');
+    }
+
+    function saveEditedDiscount(event) {
+      event.preventDefault();
+      const id = document.getElementById('edit-disc-id').value;
+      const item = appData.discounts.find(d => d.id === id);
+      if (!item) return;
+
+      const amount = parseCurrencyInput(document.getElementById('edit-disc-amount').value);
+      if (amount <= 0) {
+        showToast('Valor inválido.', 'error');
+        return;
+      }
+
+      item.date = document.getElementById('edit-disc-date').value;
+      item.amount = amount;
+      item.category = document.getElementById('edit-disc-category').value;
+      item.description = document.getElementById('edit-disc-desc').value.trim() || item.category;
+
+      saveAppData();
+      closeModal('modal-edit-discount');
+      refreshAllViews();
+      showToast('Desconto atualizado!');
+    }
+
+    function requestDelete(type, id) {
+      document.getElementById('confirm-modal-title').textContent = 'Excluir Registro?';
+      document.getElementById('confirm-modal-text').textContent =
+        'Essa ação não pode ser desfeita e atualizará seu saldo automaticamente.';
+      const btn = document.getElementById('confirm-modal-btn');
+      btn.onclick = () => {
+        if (type === 'earning') {
+          appData.earnings = appData.earnings.filter(e => e.id !== id);
+        } else {
+          appData.discounts = appData.discounts.filter(d => d.id !== id);
+        }
+        saveAppData();
+        closeModal('modal-confirm-action');
+        refreshAllViews();
+        showToast('Registro excluído.');
+      };
+      openModal('modal-confirm-action');
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. RENDERIZAÇÃO DO DASHBOARD
+    // -------------------------------------------------------------------------
+    function setDashboardPeriod(period) {
+      dashboardPeriod = period;
+      document.querySelectorAll('.dash-period-btn').forEach(btn => {
+        if (btn.dataset.dashPeriod === period) {
+          btn.classList.add('bg-gold', 'text-obsidian');
+          btn.classList.remove('text-gray-400');
+        } else {
+          btn.classList.remove('bg-gold', 'text-obsidian');
+          btn.classList.add('text-gray-400');
+        }
+      });
+      renderDashboard();
+    }
+
+    function renderDashboard() {
+      const earns = appData.earnings.filter(e => matchesPeriod(e.date, dashboardPeriod));
+      const discs = appData.discounts.filter(d => matchesPeriod(d.date, dashboardPeriod));
+
+      const totalGross = earns.reduce((s, e) => s + e.gross, 0);
+      const totalComm = earns.reduce((s, e) => s + e.commission, 0);
+      const totalDisc = discs.reduce((s, d) => s + d.amount, 0);
+      const netBalance = totalComm - totalDisc;
+      const totalReceived = earns.filter(e => e.status === 'recebido').reduce((s, e) => s + e.commission, 0);
+      const totalPending = earns.filter(e => e.status === 'pendente').reduce((s, e) => s + e.commission, 0);
+      const pendingLiquid = Math.max(0, totalPending - totalDisc);
+
+      document.getElementById('kpi-gross').textContent = formatBRL(totalGross);
+      document.getElementById('kpi-gross-count').textContent = `${earns.length} registro(s) de ganho`;
+      document.getElementById('kpi-commission').textContent = formatBRL(totalComm);
+      document.getElementById('kpi-discounts').textContent = formatBRL(totalDisc);
+      document.getElementById('kpi-discounts-count').textContent = `${discs.length} desconto(s) aplicado(s)`;
+
+      const netEl = document.getElementById('kpi-net');
+      netEl.textContent = formatBRL(netBalance);
+      netEl.className = `text-2xl sm:text-3xl font-extrabold mt-3 ${netBalance < 0 ? 'text-red-400' : 'text-white'}`;
+
+      document.getElementById('kpi-received').textContent = formatBRL(totalReceived);
+      document.getElementById('kpi-pending').textContent = formatBRL(totalPending);
+      document.getElementById('kpi-pending-liquid').textContent = `Pendente após descontos: ${formatBRL(pendingLiquid)}`;
+
+      const recent = [
+        ...appData.earnings.map(e => ({ ...e, kind: 'earning' })),
+        ...appData.discounts.map(d => ({ ...d, kind: 'discount' }))
+      ].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
+
+      const listEl = document.getElementById('recent-transactions-list');
+      if (recent.length === 0) {
+        listEl.innerHTML = `<div class="text-center py-6 px-4 border border-dashed border-slateborder rounded-xl text-xs text-gray-400">Nenhuma movimentação registrada ainda.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = recent.map(item => {
+        if (item.kind === 'earning') {
+          const isPaid = item.status === 'recebido';
+          const statusClass = isPaid ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+          return `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-obsidian p-3.5 rounded-xl subtle-border">
+              <div>
+                <p class="text-sm font-bold text-white">${escapeHTML(item.description)}</p>
+                <p class="text-xs text-gray-400">${formatDateBR(item.date)} • Bruto: ${formatBRL(item.gross)}</p>
+              </div>
+              <div class="flex items-center justify-between sm:justify-end gap-3">
+                <div class="text-left sm:text-right">
+                  <span class="text-[10px] uppercase text-gray-400 block">Comissão 50%</span>
+                  <span class="font-extrabold text-sm text-gold">+ ${formatBRL(item.commission)}</span>
+                </div>
+                <button onclick="togglePaymentStatus('${item.id}')" class="px-3 py-1.5 rounded-lg border text-xs font-bold ${statusClass}">
+                  ${isPaid ? 'Recebido' : 'Pendente'}
+                </button>
+              </div>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-obsidian p-3.5 rounded-xl subtle-border">
+              <div>
+                <p class="text-sm font-bold text-white">${escapeHTML(item.description)}</p>
+                <p class="text-xs text-gray-400">${formatDateBR(item.date)} • <span class="text-red-400">${escapeHTML(item.category)}</span></p>
+              </div>
+              <div class="flex items-center justify-between sm:justify-end gap-3">
+                <div class="text-left sm:text-right">
+                  <span class="text-[10px] uppercase text-gray-400 block">Desconto</span>
+                  <span class="font-extrabold text-sm text-red-400">- ${formatBRL(item.amount)}</span>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg bg-charcoal text-gray-400 text-[11px] font-semibold">Abatido</span>
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+    }
+
+    // -------------------------------------------------------------------------
+    // 8. RENDERIZAÇÃO DO HISTÓRICO
+    // -------------------------------------------------------------------------
+    function setHistoryFilter(period) {
+      historyPeriod = period;
+      historyCustomDate = '';
+      document.getElementById('hist-custom-date').value = '';
+      document.getElementById('hist-clear-date').classList.add('hidden');
+
+      document.querySelectorAll('.hist-period-btn').forEach(btn => {
+        if (btn.dataset.histPeriod === period) {
+          btn.classList.add('bg-gold', 'text-obsidian');
+          btn.classList.remove('text-gray-400');
+        } else {
+          btn.classList.remove('bg-gold', 'text-obsidian');
+          btn.classList.add('text-gray-400');
+        }
+      });
+      renderHistory();
+    }
+
+    function setHistoryCustomDate(dateStr) {
+      historyCustomDate = dateStr;
+      if (dateStr) {
+        document.getElementById('hist-clear-date').classList.remove('hidden');
+        document.querySelectorAll('.hist-period-btn').forEach(btn => {
+          btn.classList.remove('bg-gold', 'text-obsidian');
+          btn.classList.add('text-gray-400');
+        });
+      }
+      renderHistory();
+    }
+
+    function clearHistoryCustomDate() {
+      setHistoryFilter('all');
+    }
+
+    function renderHistory() {
+      const statusFilter = document.getElementById('hist-status-filter').value;
+      const filterDate = (d) => historyCustomDate ? d === historyCustomDate : matchesPeriod(d, historyPeriod);
+
+      const earns = appData.earnings
+        .filter(e => filterDate(e.date))
+        .filter(e => statusFilter === 'all' ? true : e.status === statusFilter)
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+      const discs = appData.discounts
+        .filter(d => filterDate(d.date))
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+      const sumGross = earns.reduce((s, e) => s + e.gross, 0);
+      const sumComm = earns.reduce((s, e) => s + e.commission, 0);
+      const sumDisc = discs.reduce((s, d) => s + d.amount, 0);
+
+      document.getElementById('hist-sum-gross').textContent = formatBRL(sumGross);
+      document.getElementById('hist-sum-comm').textContent = formatBRL(sumComm);
+      document.getElementById('hist-sum-disc').textContent = formatBRL(sumDisc);
+      document.getElementById('hist-sum-net').textContent = formatBRL(sumComm - sumDisc);
+      document.getElementById('hist-earn-badge').textContent = earns.length;
+      document.getElementById('hist-disc-badge').textContent = discs.length;
+
+      const earnListEl = document.getElementById('history-earnings-list');
+      earnListEl.innerHTML = earns.length === 0
+        ? `<div class="text-center py-6 text-xs text-gray-500 border border-dashed border-slateborder rounded-xl">Nenhum ganho neste filtro.</div>`
+        : earns.map(item => {
+            const isPaid = item.status === 'recebido';
+            const stStyle = isPaid ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+            return `
+              <div class="bg-obsidian p-4 rounded-xl subtle-border space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                  <div>
+                    <span class="text-[11px] text-gray-400">${formatDateBR(item.date)}</span>
+                    <h4 class="font-bold text-sm text-white">${escapeHTML(item.description)}</h4>
+                  </div>
+                  <button onclick="togglePaymentStatus('${item.id}')" class="px-2.5 py-1 rounded-lg border text-[11px] font-bold ${stStyle}">
+                    ${isPaid ? 'Recebido' : 'Pendente'}
+                  </button>
+                </div>
+                <div class="flex items-center justify-between pt-2 border-t border-slateborder">
+                  <div class="flex gap-4">
+                    <div>
+                      <span class="text-[10px] text-gray-400 block">Bruto</span>
+                      <span class="text-xs font-bold text-gray-200">${formatBRL(item.gross)}</span>
+                    </div>
+                    <div>
+                      <span class="text-[10px] text-gold block">Comissão 50%</span>
+                      <span class="text-sm font-extrabold text-gold">${formatBRL(item.commission)}</span>
+                    </div>
+                  </div>
+                  <div class="flex gap-1.5">
+                    <button onclick="openEditEarning('${item.id}')" class="px-2.5 py-1.5 rounded-lg bg-charcoal text-xs font-semibold text-gray-300 hover:text-gold">Editar</button>
+                    <button onclick="requestDelete('earning', '${item.id}')" class="px-2.5 py-1.5 rounded-lg bg-charcoal text-xs font-semibold text-red-400">Excluir</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+      const discListEl = document.getElementById('history-discounts-list');
+      discListEl.innerHTML = discs.length === 0
+        ? `<div class="text-center py-6 text-xs text-gray-500 border border-dashed border-slateborder rounded-xl">Nenhum desconto neste filtro.</div>`
+        : discs.map(item => `
+            <div class="bg-obsidian p-4 rounded-xl subtle-border space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <span class="text-[11px] text-gray-400">${formatDateBR(item.date)}</span>
+                  <h4 class="font-bold text-sm text-white">${escapeHTML(item.description)}</h4>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg bg-charcoal text-[11px] font-semibold text-gray-300">${escapeHTML(item.category)}</span>
+              </div>
+              <div class="flex items-center justify-between pt-2 border-t border-slateborder">
+                <div>
+                  <span class="text-[10px] text-gray-400 block">Valor Descontado</span>
+                  <span class="text-sm font-extrabold text-red-400">- ${formatBRL(item.amount)}</span>
+                </div>
+                <div class="flex gap-1.5">
+                  <button onclick="openEditDiscount('${item.id}')" class="px-2.5 py-1.5 rounded-lg bg-charcoal text-xs font-semibold text-gray-300 hover:text-gold">Editar</button>
+                  <button onclick="requestDelete('discount', '${item.id}')" class="px-2.5 py-1.5 rounded-lg bg-charcoal text-xs font-semibold text-red-400">Excluir</button>
+                </div>
+              </div>
+            </div>
+          `).join('');
+    }
+
+    // -------------------------------------------------------------------------
+    // 9. RELATÓRIOS & GRÁFICOS NATIVOS EM HTML5 CANVAS (100% OFFLINE)
+    // -------------------------------------------------------------------------
+    function setReportPeriod(period) {
+      reportPeriod = period;
+      document.querySelectorAll('.rep-period-btn').forEach(btn => {
+        if (btn.dataset.repPeriod === period) {
+          btn.classList.add('bg-gold', 'text-obsidian');
+          btn.classList.remove('text-gray-400');
+        } else {
+          btn.classList.remove('bg-gold', 'text-obsidian');
+          btn.classList.add('text-gray-400');
+        }
+      });
+      renderReports();
+    }
+
+    function renderReports() {
+      const todayStr = getTodayISO();
+      const today = parseLocalDate(todayStr);
+
+      let labels = [];
+      let commData = [];
+      let discData = [];
+      let periodEarnings = [];
+      let periodDiscounts = [];
+
+      if (reportPeriod === 'daily') {
+        document.getElementById('rep-chart-title').textContent = 'Relatório Diário (Últimos 7 Dias)';
+        document.getElementById('rep-chart-subtitle').textContent = 'Resumo do dia de hoje nos cards e evolução semanal no gráfico';
+
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(today);
+          d.setDate(today.getDate() - i);
+          const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          labels.push(`${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`);
+
+          commData.push(appData.earnings.filter(e => e.date === iso).reduce((s, e) => s + e.commission, 0));
+          discData.push(appData.discounts.filter(x => x.date === iso).reduce((s, x) => s + x.amount, 0));
+        }
+        periodEarnings = appData.earnings.filter(e => e.date === todayStr);
+        periodDiscounts = appData.discounts.filter(d => d.date === todayStr);
+
+      } else if (reportPeriod === 'weekly') {
+        document.getElementById('rep-chart-title').textContent = 'Relatório Semanal (Semana Atual)';
+        document.getElementById('rep-chart-subtitle').textContent = 'Domingo a Sábado desta semana';
+
+        const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        const start = new Date(today);
+        start.setDate(today.getDate() - today.getDay());
+
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(start);
+          d.setDate(start.getDate() + i);
+          const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          labels.push(dayNames[i]);
+
+          commData.push(appData.earnings.filter(e => e.date === iso).reduce((s, e) => s + e.commission, 0));
+          discData.push(appData.discounts.filter(x => x.date === iso).reduce((s, x) => s + x.amount, 0));
+        }
+        periodEarnings = appData.earnings.filter(e => matchesPeriod(e.date, 'week'));
+        periodDiscounts = appData.discounts.filter(d => matchesPeriod(d.date, 'week'));
+
+      } else if (reportPeriod === 'monthly') {
+        document.getElementById('rep-chart-title').textContent = 'Relatório Mensal (Mês Atual)';
+        document.getElementById('rep-chart-subtitle').textContent = 'Consolidado por semana do mês';
+
+        const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+        const buckets = [
+          { label: 'Sem 1', min: 1, max: 7 },
+          { label: 'Sem 2', min: 8, max: 14 },
+          { label: 'Sem 3', min: 15, max: 21 },
+          { label: 'Sem 4', min: 22, max: daysInMonth }
+        ];
+
+        periodEarnings = appData.earnings.filter(e => matchesPeriod(e.date, 'month'));
+        periodDiscounts = appData.discounts.filter(d => matchesPeriod(d.date, 'month'));
+
+        buckets.forEach(b => {
+          labels.push(b.label);
+          commData.push(periodEarnings.filter(e => {
+            const day = parseInt(e.date.split('-')[2], 10);
+            return day >= b.min && day <= b.max;
+          }).reduce((s, e) => s + e.commission, 0));
+          discData.push(periodDiscounts.filter(d => {
+            const day = parseInt(d.date.split('-')[2], 10);
+            return day >= b.min && day <= b.max;
+          }).reduce((s, d) => s + d.amount, 0));
+        });
+
+      } else if (reportPeriod === 'annual') {
+        const year = today.getFullYear();
+        document.getElementById('rep-chart-title').textContent = `Relatório Anual (${year})`;
+        document.getElementById('rep-chart-subtitle').textContent = 'Desempenho mês a mês no ano';
+
+        const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        periodEarnings = appData.earnings.filter(e => e.date.startsWith(String(year)));
+        periodDiscounts = appData.discounts.filter(d => d.date.startsWith(String(year)));
+
+        months.forEach((m, idx) => {
+          labels.push(m);
+          const prefix = `${year}-${String(idx + 1).padStart(2, '0')}`;
+          commData.push(periodEarnings.filter(e => e.date.startsWith(prefix)).reduce((s, e) => s + e.commission, 0));
+          discData.push(periodDiscounts.filter(d => d.date.startsWith(prefix)).reduce((s, d) => s + d.amount, 0));
+        });
+      }
+
+      const repGross = periodEarnings.reduce((s, e) => s + e.gross, 0);
+      const repComm = periodEarnings.reduce((s, e) => s + e.commission, 0);
+      const repDisc = periodDiscounts.reduce((s, d) => s + d.amount, 0);
+
+      document.getElementById('rep-gross').textContent = formatBRL(repGross);
+      document.getElementById('rep-comm').textContent = formatBRL(repComm);
+      document.getElementById('rep-disc').textContent = formatBRL(repDisc);
+      document.getElementById('rep-net').textContent = formatBRL(repComm - repDisc);
+
+      drawNativeBarChart(labels, commData, discData);
+      drawNativeDonutChart(periodDiscounts);
+    }
+
+    // Desenha gráfico de barras agrupadas em Canvas puro (sem internet)
+    function drawNativeBarChart(labels, commData, discData) {
+      const canvas = document.getElementById('nativeBarCanvas');
+      if (!canvas || !canvas.parentElement) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const width = Math.max(280, rect.width);
+      const height = 280;
+
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, width, height);
+
+      const padLeft = 52;
+      const padRight = 16;
+      const padTop = 22;
+      const padBottom = 34;
+      const chartW = width - padLeft - padRight;
+      const chartH = height - padTop - padBottom;
+
+      const maxVal = Math.max(100, ...commData, ...discData) * 1.15;
+
+      // Linhas de grade horizontais
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.fillStyle = '#A1A1AA';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'right';
+
+      const steps = 4;
+      for (let i = 0; i <= steps; i++) {
+        const y = padTop + chartH - (i / steps) * chartH;
+        const val = Math.round((i / steps) * maxVal);
+        ctx.beginPath();
+        ctx.moveTo(padLeft, y);
+        ctx.lineTo(width - padRight, y);
+        ctx.stroke();
+        ctx.fillText('R$' + val, padLeft - 6, y + 3);
+      }
+
+      // Barras
+      const groupW = chartW / labels.length;
+      const barW = Math.min(18, Math.max(6, groupW * 0.28));
+
+      labels.forEach((label, idx) => {
+        const centerX = padLeft + groupW * idx + groupW / 2;
+
+        // Barra Comissão (Dourada)
+        const hComm = (commData[idx] / maxVal) * chartH;
+        ctx.fillStyle = '#D4AF37';
+        ctx.fillRect(centerX - barW - 2, padTop + chartH - hComm, barW, hComm);
+
+        // Barra Desconto (Vermelha)
+        const hDisc = (discData[idx] / maxVal) * chartH;
+        ctx.fillStyle = '#F87171';
+        ctx.fillRect(centerX + 2, padTop + chartH - hDisc, barW, hDisc);
+
+        // Rótulo eixo X
+        ctx.fillStyle = '#A1A1AA';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(label, centerX, height - 12);
+      });
+    }
+
+    // Desenha gráfico de rosca por categoria em Canvas puro
+    function drawNativeDonutChart(periodDiscounts) {
+      const categories = ['Adiantamento', 'Alimentação', 'Produtos', 'Outros'];
+      const colors = ['#D4AF37', '#F87171', '#60A5FA', '#A78BFA'];
+      const totals = categories.map(c =>
+        periodDiscounts.filter(d => d.category === c).reduce((s, d) => s + d.amount, 0)
+      );
+      const sumAll = totals.reduce((a, b) => a + b, 0);
+
+      const canvas = document.getElementById('nativeDonutCanvas');
+      const breakdownEl = document.getElementById('category-breakdown-list');
+      if (!canvas) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const size = 190;
+      canvas.width = size * dpr;
+      canvas.height = size * dpr;
+      canvas.style.width = size + 'px';
+      canvas.style.height = size + 'px';
+
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, size, size);
+
+      const cx = size / 2;
+      const cy = size / 2;
+      const radius = 72;
+      const lineWidth = 22;
+
+      if (sumAll <= 0) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = '#27272E';
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+
+        ctx.fillStyle = '#71717A';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sem descontos', cx, cy + 4);
+        breakdownEl.innerHTML = '';
+        return;
+      }
+
+      let startAngle = -Math.PI / 2;
+      totals.forEach((val, idx) => {
+        if (val <= 0) return;
+        const sliceAngle = (val / sumAll) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
+        ctx.strokeStyle = colors[idx];
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+        startAngle += sliceAngle;
+      });
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(formatBRL(sumAll), cx, cy + 4);
+
+      breakdownEl.innerHTML = categories.map((cat, idx) => `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full inline-block" style="background:${colors[idx]}"></span>
+            <span class="text-gray-300">${cat}</span>
+          </div>
+          <span class="font-bold text-white">${formatBRL(totals[idx])}</span>
+        </div>
+      `).join('');
+    }
+
+    function refreshAllViews() {
+      renderDashboard();
+      renderHistory();
+      if (currentTab === 'relatorios') {
+        renderReports();
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 10. INICIALIZAÇÃO DO SISTEMA
+    // -------------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      loadAppData();
+
+      // Preencher data de hoje nos formulários
+      const today = getTodayISO();
+      ['dash-earn-date', 'dash-disc-date', 'tab-earn-date', 'tab-disc-date'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = today;
+      });
+
+      // Se o usuário marcou "Lembrar sessão" anteriormente, entra direto
+      if (appData.account && appData.account.remember) {
+        isUnlocked = true;
+      }
+
+      setDashboardPeriod('all');
+      setHistoryFilter('all');
+      setReportPeriod('weekly');
+      switchTab('dashboard');
+      renderAuthOrApp();
+    });
+
+    window.addEventListener('resize', () => {
+      if (currentTab === 'relatorios' && isUnlocked) {
+        renderReports();
+      }
+    });
+  </script>
+</body>
+</html>
